@@ -1,0 +1,5 @@
+# generate private key first
+openssl genrsa -out privatekey.pem 2048
+
+# generate publickey
+openssl rsa -in privatekey.pem -pubout -out publickey.crt

@@ -1,0 +1,45 @@
+# install jdk
+brew install openjdk@11
+
+# set paths
+export PATH=“/usr/local/opt/openjdk@11/bin:$PATH”
+export CPPFLAGS=“-I/usr/local/opt/openjdk@11/include”
+——————————————————————————————————
+#For the system Java wrappers to find this JDK, symlink it with
+  sudo ln -sfn /opt/homebrew/opt/openjdk@11/libexec/openjdk.jdk /Library/Java/JavaVirtualMachines/openjdk-11.jdk
+
+# You can use following two commands instead of above # set paths commands
+If you need to have openjdk@11 first in your PATH, run:
+  echo 'export PATH="/opt/homebrew/opt/openjdk@11/bin:$PATH"' >> ~/.zshrc
+
+# For compilers to find openjdk@11 you may need to set:
+  export CPPFLAGS="-I/opt/homebrew/opt/openjdk@11/include"
+
+# download and extract kafka
+curl https://archive.apache.org/dist/kafka/3.3.1/kafka_2.13-3.3.1.tgz --output kafka_2.13-3.3.1.tgz
+tar -xzf kafka_2.13-3.3.1.tgz
+
+# install kafka connector
+cd kafka_2.13-3.3.1/libs
+curl https://repo1.maven.org/maven2/com/snowflake/snowflake-kafka-connector/1.9.1/snowflake-kafka-connector-1.9.1.jar --output snowflake-kafka-connector-1.9.1.jar
+
+# run zookeeper
+bin/zookeeper-server-start.sh config/zookeeper.properties
+
+# run server
+bin/kafka-server-start.sh config/server.properties
+
+# run connector in standalone mode
+bin/connect-standalone.sh ./config/connect-standalone.properties ./config/SF_connect.properties
+
+# publish into topic
+bin/kafka-console-producer.sh --topic my_kafka_topic --bootstrap-server localhost:9092 
+
+# to see the messages in a topic
+bin/kafka-console-consumer.sh  --bootstrap-server localhost:9092 --topic my_kafka_topic --from-beginning
+
+# list topics
+bin/kafka-topics.sh --bootstrap-server [broker0:9092,broker1:9092..] --describe
+
+# delete a topic
+bin/kafka-topics.sh --bootstrap-server localhost:9092 --delete --topic my_kafka_topic
